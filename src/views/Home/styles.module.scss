@@ -1,0 +1,65 @@
+.container {
+  width: 100%;
+
+  .dashboard {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cores {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  background: white;
+  padding-block: 1rem;
+
+  margin-top: 1rem;
+
+  button {
+    box-shadow: none !important;
+    background: transparent !important;
+    color: #000 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      display: block;
+      width: 10px;
+      height: 10px;
+      margin-left: 0.5rem;
+    }
+  }
+
+  .faltas {
+    span {
+      background-color: #28a745 !important;
+      border-radius: 50%;
+    }
+  }
+
+  .horas {
+    span {
+      background-color: red !important;
+    }
+  }
+}
+
+.graficos {
+  margin-top: 1.5rem;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 2rem;
+
+  > div {
+    background: white;
+    padding: 1rem;
+    height: 45vh;
+  }
+}

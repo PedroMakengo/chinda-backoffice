@@ -1,0 +1,41 @@
+.container-navbar {
+  background: #2e8ceb;
+  border-right: 0;
+  color: #fff;
+  position: fixed !important;
+}
+
+.custom-title {
+  color: black;
+  font-size: 1.1rem !important;
+  color: #fff;
+}
+
+.v-list-group__items .v-list-item {
+  padding-inline: 26px !important;
+}
+
+.btnSair {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+.containerButons {
+  display: flex;
+  align-items: center;
+
+  width: 98%;
+
+  > button {
+    width: 50%;
+  }
+
+  > button:last-child {
+    background-color: #23395b !important;
+    color: #fff !important;
+    //border-radius: 0;
+  }
+}

@@ -1,0 +1,31 @@
+:root {
+  --bg-primary: #2e8ceb;
+  --bg-secondary: red;
+  --bg-tertialy: blue;
+
+  --bg-white: #fff;
+  --bg-black: #000;
+}
+
+.v-layout {
+  display: block !important;
+}
+
+.v-col-md-4,
+.v-col-12,
+.v-col-sm-6,
+.v-col-md-4,
+.v-col-12,
+.v-col-2,
+.v-col .v-col-4 {
+  padding: 0 12px !important;
+}
+
+.container {
+  width: 100%;
+}
+
+.formulario {
+  padding-inline: 1.5rem;
+  padding-block: 1rem;
+}

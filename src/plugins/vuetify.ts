@@ -1,19 +1,36 @@
-/**
- * plugins/vuetify.ts
- *
- * Framework documentation: https://vuetifyjs.com`
- */
+import "@mdi/font/css/materialdesignicons.css";
+import "vuetify/styles";
+import { createVuetify } from "vuetify";
+import { VDataTable } from "vuetify/labs/VDataTable";
 
-// Styles
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
-
-// Composables
-import { createVuetify } from 'vuetify'
-
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
-  theme: {
-    defaultTheme: 'dark',
+  components: { VDataTable },
+  defaults: {
+    VTextField: {
+      variant: "outlined",
+      density: "compact",
+    },
+    VAutocomplete: {
+      density: "compact",
+      variant: "outlined",
+    },
+    vtextarea: {
+      density: "compact",
+      variant: "outlined",
+    },
+    VDataTable: {
+      noDataText: "Sem Informações",
+      itemsPerPageText: "Linhas por página",
+    },
   },
-})
+  theme: {
+    themes: {
+      light: {
+        colors: {
+          primary: "#1867C0",
+          secondary: "#5CBBF6",
+        },
+      },
+    },
+  },
+});

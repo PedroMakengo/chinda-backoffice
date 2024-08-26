@@ -1,0 +1,52 @@
+.container {
+  background: var(--bg-white);
+  height: auto;
+  border-radius: 0.2rem;
+
+  display: flex;
+  padding-inline: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1rem;
+
+  &.info {
+    border-top: 2px solid #2e8ceb;
+  }
+
+  .contador {
+    > h2 {
+      font-size: 1.5rem !important;
+    }
+    width: 75%;
+
+    > p {
+      font-size: 0.875rem;
+    }
+  }
+
+  .icon {
+    width: 50px !important;
+    height: 50px !important;
+    background: var(--bg-primary);
+    color: var(--bg-white);
+
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 0.5rem;
+
+    &.error {
+      background: red;
+      border-bottom: 1px solid red;
+    }
+
+    &.success {
+      background: #28a745;
+    }
+    &.warning {
+      background: #ffc107;
+    }
+  }
+}

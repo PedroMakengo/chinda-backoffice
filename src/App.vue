@@ -1,16 +1,11 @@
 <template>
   <v-app>
-    <v-main>
-      <nav>
-        <RouterLink to="/">Go to Home</RouterLink>
-        <RouterLink to="/about">Go to About</RouterLink>
-      </nav>
-
-      <router-view />
-    </v-main>
+    <router-view v-slot="{ Component }">
+      <v-fade-transition mode="out-in">
+        <component :is="Component" />
+      </v-fade-transition>
+    </router-view>
   </v-app>
 </template>
 
-<script lang="ts" setup>
-//
-</script>
+<script lang="ts" setup></script>

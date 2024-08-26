@@ -1,0 +1,16 @@
+.containerTitle {
+  padding-inline: 1.5rem;
+  padding-block: 0.2rem;
+  background: var(--bg-primary);
+  color: #fff;
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .text-h5 {
+    font-size: 1rem !important;
+    text-transform: uppercase !important;
+  }
+}

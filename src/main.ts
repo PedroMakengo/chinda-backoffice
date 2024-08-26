@@ -1,20 +1,20 @@
-/**
- * main.ts
- *
- * Bootstraps Vuetify and other plugins then mounts the App`
- */
+import { createApp } from "vue";
+import App from "./App.vue";
+import { createPinia } from "pinia";
+import Toaster from "@meforma/vue-toaster";
+import ToastPlugin, { POSITION } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
-// Plugins
-import { registerPlugins } from '@/plugins'
+import "./assets/styles/global.scss";
 
-// Components
-import App from './App.vue'
+import { registerPlugins } from "@/plugins";
 
-// Composables
-import { createApp } from 'vue'
+const pinia = createPinia();
+const app = createApp(App);
 
-const app = createApp(App)
+app.use(Toaster);
+app.use(pinia);
+app.use(ToastPlugin, { position: POSITION.TOP_RIGHT });
 
-registerPlugins(app)
-
-app.mount('#app')
+registerPlugins(app);
+app.mount("#app");

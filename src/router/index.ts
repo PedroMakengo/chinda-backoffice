@@ -1,42 +1,45 @@
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
 // Composables
-import Home from "../pages/index.vue";
-import About from "../pages/About.vue";
-import { createRouter, createWebHistory } from "vue-router/auto";
-// import { routes } from 'vue-router/auto-routes'
+import { createRouter, createWebHistory } from "vue-router";
+import Login from "../views/Login/index.vue";
+import ResetPassword from "../views/ResetPassword/index.vue";
+import Site from "../views/Site/index.vue";
+import Cadastro from "../views/Cadastro/index.vue";
+import Layout from "../views/Layout/index.vue";
+// isIntegrator
+
+import midd_auth from "@/middleware/midd_auth";
+import module_admin from "@/router/modules/module_admin";
+
+// Use o objeto useAuthStore
 
 const routes = [
-  { path: "/", component: Home },
-  { path: "/about", component: About },
+  {
+    base: "/index.html",
+    path: "/",
+    name: "main",
+    component: Login,
+  },
+  {
+    path: "/reset-password",
+    component: ResetPassword,
+  },
+  {
+    path: "/dashboard",
+    component: Layout,
+    meta: { requiresAuth: true },
+    children: [...module_admin],
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
-// Workaround for https://github.com/vitejs/vite/issues/11804
-router.onError((err, to) => {
-  if (err?.message?.includes?.("Failed to fetch dynamically imported module")) {
-    if (!localStorage.getItem("vuetify:dynamic-reload")) {
-      console.log("Reloading page to fix dynamic import error");
-      localStorage.setItem("vuetify:dynamic-reload", "true");
-      location.assign(to.fullPath);
-    } else {
-      console.error("Dynamic import error, reloading page did not fix it", err);
-    }
-  } else {
-    console.error(err);
-  }
-});
+// router.beforeEach((to, from) => {
+//   return true;
+// });
 
-router.isReady().then(() => {
-  localStorage.removeItem("vuetify:dynamic-reload");
-});
+router.beforeEach(midd_auth);
 
 export default router;
