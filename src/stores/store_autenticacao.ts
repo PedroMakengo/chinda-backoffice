@@ -51,7 +51,6 @@ class AuthStore {
 
   async havePermissions(params: any) {
     const user = (await localdb.read("user")) as any;
-    console.log("userr,", user);
     return await localdb.remove("empresa");
   }
 }

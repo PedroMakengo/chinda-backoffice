@@ -72,7 +72,7 @@ export default defineComponent({
             <v-btn @click="onSubmitResetPassword">Reset Password</v-btn>
             <p class="reset-password">
               Lembrou da senha ?
-              <router-link to="/login">Iniciar Sessão</router-link>
+              <router-link to="/">Iniciar Sessão</router-link>
             </p>
           </v-col>
         </v-row>

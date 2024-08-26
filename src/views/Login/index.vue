@@ -101,11 +101,6 @@ export default defineComponent({
 
         <v-btn block type="submit" :loading="loading"> Iniciar Sessão </v-btn>
 
-        <p class="register">
-          Faça o seu registro,
-          <router-link to="/">Registrar-se</router-link>
-        </p>
-
         <p class="reset-password">
           Esqueceu a tua senha ?
           <router-link to="/reset-password">Redefinir senha</router-link>

@@ -4,13 +4,13 @@ import { authStore } from "@/stores/store_autenticacao";
 const authMiddleware = async (to: any, from: any, next: any) => {
   const isAuthenticated = await checkUserAuthentication();
 
-  if (isAuthenticated && to.path === "/login") {
+  if (isAuthenticated && to.path === "/") {
     await router.push("/dashboard");
     return;
   }
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    router.push("/login");
+    router.push("/");
   } else if (to.meta.requiresGuest && isAuthenticated) {
     router.push("/dashboard");
   } else {
