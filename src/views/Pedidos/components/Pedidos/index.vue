@@ -8,6 +8,7 @@ import { UsecaseListaEspecializacoes } from "@/Domain/Usecases/Especializacoes/u
 import { useToast } from "vue-toastification";
 import { openBase64Pdf } from "@/utils/openBase64Pdf";
 import { FormatarData } from "@/utils/formatarData";
+import { UsecaseListaPedidosAnexos } from "@/Domain/Usecases/Pedidos/usecase_pedidos_anexos";
 
 export default defineComponent({
   components: { TitleModal },
@@ -46,6 +47,7 @@ export default defineComponent({
 
     const loadingRejeitado = ref(false);
     const loadingAceitado = ref(false);
+    const loadingProcessamentoArquivos = ref(false);
 
     // DATA RETORNADO DOS PEDIDOS DE INSCRIÇÃO
     const dataListaEspecializacao = ref<any>([]);
@@ -156,6 +158,15 @@ export default defineComponent({
       }
     };
 
+    const handlerAnexosPedidos = async (processo: string) => {
+      loadingProcessamentoArquivos.value = true;
+
+      const response = await UsecaseListaPedidosAnexos.handler(processo);
+      dataArquivos.value = response?.object;
+
+      loadingProcessamentoArquivos.value = false;
+    };
+
     const handleDetailsPedidos = (item: any) => {
       dataObjecto.value = {
         especializacao: item.especializacao,
@@ -168,8 +179,8 @@ export default defineComponent({
       };
 
       dataVinculo.value = item.vinculos;
-      dataArquivos.value = item.anexos;
       modalDetalhesPedidos.value = true;
+      handlerAnexosPedidos(item.processo);
     };
 
     const handleOpen = (arquivo: string) => {
@@ -199,6 +210,7 @@ export default defineComponent({
       FormatarData,
       loadingRejeitado,
       loadingAceitado,
+      loadingProcessamentoArquivos,
 
       // DATA PEDIDOS
       dataArquivos,
@@ -237,6 +249,10 @@ export default defineComponent({
           :items="dataListaPedidos"
           :loading="loadingTabela"
         >
+          <template v-slot:[`item.estado`]="{ item }">
+            <v-chip label color="orange">{{ item.estado.descricao }}</v-chip>
+          </template>
+
           <template v-slot:[`item.accoes`]="{ item }">
             <v-menu transition="slide-x-transition">
               <template v-slot:activator="{ props }">
@@ -377,18 +393,36 @@ export default defineComponent({
                   </v-col>
 
                   <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
-                  <v-col cols="12" md="12" class="mt-2 mb-2">
-                    <template v-for="(el, index) in dataArquivos" :key="index">
-                      <v-chip
-                        color="green"
-                        class="mr-2"
-                        label
-                        @click="handleOpen(el.content)"
-                      >
-                        {{ el.nome }}
-                      </v-chip>
-                    </template>
-                  </v-col>
+
+                  <template v-if="loadingProcessamentoArquivos">
+                    <v-col cols="12" md="12">
+                      <v-skeleton-loader type="paragraph"></v-skeleton-loader>
+                    </v-col>
+                  </template>
+
+                  <div v-else>
+                    <v-col cols="12" md="12" class="mt-2 mb-2">
+                      <div v-if="dataArquivos.length > 0">
+                        <template
+                          v-for="(el, index) in dataArquivos"
+                          :key="index"
+                        >
+                          <v-chip
+                            color="green"
+                            class="mr-2 mb-2"
+                            label
+                            @click="handleOpen(el.content)"
+                          >
+                            {{ el.nome }}
+                          </v-chip>
+                        </template>
+                      </div>
+
+                      <div v-else>
+                        <p>Não existe nenhum arquivo</p>
+                      </div>
+                    </v-col>
+                  </div>
                   <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
                 </v-row>
               </form>
