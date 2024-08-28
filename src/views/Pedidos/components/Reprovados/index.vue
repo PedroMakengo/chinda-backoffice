@@ -25,7 +25,7 @@ export default defineComponent({
       { key: "nome", title: "Nome" },
       { key: "sobrenome", title: "Sobrenome" },
       { key: "telefone", title: "Telefone" },
-      { key: "especializacao", title: "Especialização" },
+      { key: "especializacao.descricao", title: "Especialização" },
       { key: "estado", title: "Estado" },
       { key: "accoes", title: "Acções", sortable: false },
     ]);
