@@ -6,28 +6,21 @@ const codigo = ref("");
 
 const utilizador = ref<any>({});
 const nome = ref("");
-const sobrenome = ref("");
 
 const obterInformacoesUtilizadorLogado = async () => {
   const response = await UsecaseObterListaMedicoLogado.handler();
   utilizador.value = response?.object;
 
-  nome.value = utilizador.value?.funcionario.nome;
-  sobrenome.value = utilizador.value?.funcionario.sobrenome;
+  nome.value = utilizador.value?.userName;
 };
 
 const nomeDoUtilizador = computed(() => {
-  return `${nome.value} ${sobrenome.value}`;
+  return `${nome.value}`;
 });
 
 onMounted(() => {
   obterInformacoesUtilizadorLogado();
 });
-
-var items = [
-  { title: "Perfil", route: "/perfil", icon: "" },
-  { title: "Terminar Sessão", route: "/logout", icon: "" },
-];
 </script>
 
 <template>

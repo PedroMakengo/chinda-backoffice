@@ -37,7 +37,7 @@ export const storeAutenticacao = defineStore("UsecaseAutenticacao", () => {
   // Função para pegar usuário
   async function getDadosDoUtilizador() {
     try {
-      const { object } = await httpClient.get("utilizadores");
+      const { object } = await httpClient.get("utilizadores/token");
       return object;
     } catch (error) {
       console.error("Erro ao verificar o token: ", error);

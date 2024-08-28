@@ -8,7 +8,7 @@ const terminarSessao = () => {
   authStore.deleteToken();
   authStore.deleteUtilizador();
 
-  $router.replace("/login");
+  $router.replace("/");
 };
 
 const drawer = ref(true);
@@ -70,8 +70,8 @@ const dialog = ref(false);
       <v-card>
         <v-card-text> Tens certeza que desejas sair da aplicação? </v-card-text>
         <v-card-actions class="containerButons">
-          <v-btn color="primary" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="terminarSessao()">Sair </v-btn>
+          <v-btn color="blue" @click="dialog = false">Cancelar</v-btn>
+          <v-btn color="blue" @click="terminarSessao()">Sair </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

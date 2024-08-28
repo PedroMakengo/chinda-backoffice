@@ -24,9 +24,20 @@ class AxiosHttpClient implements IHttpClient {
     this.instance.interceptors.request.use(
       async (request: any): Promise<any> => {
         const token = await authStore.obterToken();
-        request.headers = token === null ? "" : token.token;
-        request["authorization"] = `Bearer ${token}`;
-        request["Content-Type"] = "application/json";
+
+        // Verifica se os cabeçalhos já existem, se não, cria um novo objeto para eles
+        if (!request.headers) {
+          request.headers = {};
+        }
+
+        // Adiciona o cabeçalho Authorization
+        if (token && token.token) {
+          request.headers["Authorization"] = "Bearer" + ` ${token.token}`;
+        }
+
+        // Adiciona o cabeçalho Content-Type
+        request.headers["Content-Type"] = "application/json";
+
         return request;
       }
     );
