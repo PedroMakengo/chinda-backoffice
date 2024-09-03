@@ -3,14 +3,17 @@ import { defineComponent, ref, onMounted, watch } from "vue";
 import Title from "@/components/Title/index.vue";
 import { UsecaseListaMedicos } from "@/Domain/Usecases/Medicos/usecase_lista_medicos";
 import { UsecaseListaMedicosEspecializacao } from "@/Domain/Usecases/Medicos/usecase_lista_medicos_especializacao";
+import { UsecaseListaMedicosPorId } from "@/Domain/Usecases/Medicos/usecase_lista_medicos_id";
 import { UsecaseListaEspecializacoes } from "@/Domain/Usecases/Especializacoes/usecase_lista_especializacoes";
-import { UsecaseListaProvincias } from "../../Domain/Usecases/Provincias/usecase_lista_provincias";
+import { UsecaseListaProvincias } from "@/Domain/Usecases/Provincias/usecase_lista_provincias";
+import { FormatarData } from "@/utils/formatarData";
 
 export default defineComponent({
   components: { Title },
   setup() {
     // VARIAVIES
     const loading = ref(false);
+    const modalDetalhesMedicos = ref(false);
     const search = ref("");
     const cabecalhoTabela = ref<any>([
       { key: "itens", title: "#" },
@@ -21,10 +24,14 @@ export default defineComponent({
       { key: "precoConsulta", title: "Preço Consulta" },
       { key: "accoes", title: "Acções", sortable: false },
     ]);
+
+    const dataVinculo = ref<any>([]);
     const dataListaMedicos = ref<any>([]);
+    const dataMedico = ref<any>([]);
     const dataEspecializacao = ref<any>([]);
     const dataProvincias = ref<any>([]);
-    const forms = ref({
+    const dataObjecto = ref<any>({});
+    const forms = ref<any>({
       especializacao: undefined!,
       provincia: undefined!,
     });
@@ -61,11 +68,31 @@ export default defineComponent({
       });
     };
 
+    const buscarMedicoPorId = async (id: number | string) => {
+      const response = await UsecaseListaMedicosPorId.handler(id);
+
+      dataMedico.value = response?.object;
+
+      console.log(dataMedico.value);
+    };
+
     const onRefreshDataAprrovad = async () => {
       loading.value = true;
+
       await buscarListaMedidos();
 
       loading.value = false;
+    };
+
+    const onRemoveFilter = () => {
+      onRefreshDataAprrovad();
+      forms.value.especializacao = undefined;
+      forms.value.provincia = undefined;
+    };
+
+    const handlerDetalhesMedicos = (item: any) => {
+      dataVinculo.value = item.vinculos;
+      buscarMedicoPorId(item.id);
     };
 
     watch(
@@ -90,6 +117,12 @@ export default defineComponent({
       dataEspecializacao,
       dataProvincias,
       onRefreshDataAprrovad,
+      onRemoveFilter,
+      modalDetalhesMedicos,
+      FormatarData,
+      handlerDetalhesMedicos,
+      dataMedico,
+      dataObjecto,
     };
   },
 });
@@ -126,7 +159,10 @@ export default defineComponent({
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="3">
-                <v-btn color="blue">Pesquisar</v-btn>
+                <v-btn color="blue" class="mr-2">Pesquisar</v-btn>
+                <v-btn color="orange" class="text-white" @click="onRemoveFilter"
+                  >Limpar Filtro</v-btn
+                >
               </v-col>
             </v-row>
           </form>
@@ -154,8 +190,8 @@ export default defineComponent({
                 </v-btn>
               </template>
               <v-list>
-                <v-list-item :value="1">
-                  <v-list-item-title>Detalhes</v-list-item-title>
+                <v-list-item :value="1" @click="handlerDetalhesMedicos(item)">
+                  <v-list-item-title>Detalhes </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -163,6 +199,152 @@ export default defineComponent({
         </v-data-table>
       </div>
     </div>
+
+    <!-- MODAL -->
+    <v-dialog v-model="modalDetalhesMedicos" width="85%" persistent>
+      <v-card>
+        <TitleModal
+          title="Detalhes Pedido de Inscrição"
+          @fechar="modalDetalhesMedicos = false"
+        />
+        <v-card-text>
+          <div class="formulario">
+            <form class="spacing">
+              <v-row class="pt-4 pb-4">
+                <v-col cols="12" md="4">
+                  <v-text-field
+                    clearable
+                    label="Processo"
+                    variant="outlined"
+                    v-model="dataObjecto.processo"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field
+                    clearable
+                    label="Nome"
+                    variant="outlined"
+                    v-model="dataObjecto.nome"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field
+                    clearable
+                    label="Sobrenome"
+                    variant="outlined"
+                    v-model="dataObjecto.sobrenome"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field
+                    clearable
+                    label="Telefone"
+                    variant="outlined"
+                    v-model="dataObjecto.telefone"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="8">
+                  <v-autocomplete
+                    clearable
+                    label="Especialização"
+                    variant="outlined"
+                    :items="dataEspecializacao"
+                    v-model="dataObjecto.especializacao"
+                    item-title="descricao"
+                    item-value="id"
+                    readonly
+                  ></v-autocomplete>
+                </v-col>
+              </v-row>
+
+              <v-row class="mt-4 pt-4">
+                <v-col>
+                  <v-divider></v-divider>
+                </v-col>
+
+                <v-col cols="12" md="12">
+                  <h2>Vínculos</h2>
+                </v-col>
+
+                <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
+                <v-col
+                  md="12"
+                  cols="6"
+                  v-for="(el, index) in dataVinculo"
+                  :key="index"
+                >
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-image">
+                        {{ el.hospital[0] }}
+                      </div>
+                      <div class="card-descricao">
+                        <h4>{{ el.hospital }}</h4>
+                        <span class="item-cidade"
+                          >{{ el.cidade }} - {{ el.pais }}</span
+                        >
+                        <h5>
+                          {{ FormatarData(el.dataInicio) }} -
+                          {{ FormatarData(el.dataFim) }}
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                </v-col>
+                <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
+              </v-row>
+
+              <v-row class="mt-4 pt-4">
+                <v-col>
+                  <v-divider></v-divider>
+                </v-col>
+                <v-col cols="12" md="12">
+                  <h2>Arquivos</h2>
+                </v-col>
+
+                <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
+
+                <!-- <template v-if="loadingProcessamentoArquivos">
+                  <v-col cols="12" md="12">
+                    <v-skeleton-loader type="paragraph"></v-skeleton-loader>
+                  </v-col>
+                </template>
+
+                <div v-else>
+                  <v-col cols="12" md="12" class="mt-2 mb-2">
+                    <div v-if="dataArquivos.length > 0">
+                      <template
+                        v-for="(el, index) in dataArquivos"
+                        :key="index"
+                      >
+                        <v-chip
+                          color="green"
+                          class="mr-2 mb-2"
+                          label
+                          @click="handleOpen(el.content)"
+                        >
+                          {{ el.nome }}
+                        </v-chip>
+                      </template>
+                    </div>
+
+                    <div v-else>
+                      <p>Não existe nenhum arquivo</p>
+                    </div>
+                  </v-col>
+                </div> -->
+                <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
+              </v-row>
+            </form>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!-- END MODAL -->
   </div>
 </template>
 
