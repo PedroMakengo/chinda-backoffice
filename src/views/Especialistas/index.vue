@@ -172,7 +172,7 @@ export default defineComponent({
           :loading="loading"
           :items="dataListaEspecializacao"
         >
-          <template v-slot:[`item.accoes`]="{ item }">
+          <template v-slot:[`item.accoes`]="{ item }: any">
             <v-menu transition="slide-x-transition">
               <template v-slot:activator="{ props }">
                 <v-btn icon="mdi-dots-vertical" size="small" v-bind="props">
