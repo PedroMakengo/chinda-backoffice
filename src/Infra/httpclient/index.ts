@@ -17,7 +17,7 @@ interface IHttpClient {
 
 class AxiosHttpClient implements IHttpClient {
   private instance: AxiosInstance = axios.create({
-    baseURL: "http://160.242.22.61:1212/chinda/",
+    baseURL: "http://chinda.isfactory.app/chinda/",
   });
 
   constructor() {
