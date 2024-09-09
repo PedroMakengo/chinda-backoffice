@@ -1,5 +1,6 @@
 import { httpClient } from "@/Infra/httpclient";
 import { authStore } from "@/stores/store_autenticacao";
+import { Console, error } from "console";
 import { defineStore } from "pinia";
 
 export const storeAutenticacao = defineStore("UsecaseAutenticacao", () => {
@@ -13,14 +14,19 @@ export const storeAutenticacao = defineStore("UsecaseAutenticacao", () => {
 
       const response = await httpClient.post("login", data);
 
-      const token = response.object;
-
-      if (response?.statusCode === 200) {
-        if (token) {
-          authStore.salvarToken(token);
-        }
+      if(!response.success)
+      {
+          console.log("Credenciais inválidas");
+          
+          return;
       }
 
+      const token = response.object;
+
+      if (token) {
+        authStore.salvarToken(token);
+      }
+      
       const utilizador = await getDadosDoUtilizador();
 
       return { response, utilizador };
