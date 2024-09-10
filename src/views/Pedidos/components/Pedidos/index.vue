@@ -9,6 +9,7 @@ import { useToast } from "vue-toastification";
 import { openBase64Pdf } from "@/utils/openBase64Pdf";
 import { FormatarData } from "@/utils/formatarData";
 import { UsecaseListaPedidosAnexos } from "@/Domain/Usecases/Pedidos/usecase_pedidos_anexos";
+import { useStorePedidos } from "@/stores/store_pedidos";
 
 export default defineComponent({
   components: { TitleModal },
@@ -48,6 +49,8 @@ export default defineComponent({
     const loadingRejeitado = ref(false);
     const loadingAceitado = ref(false);
     const loadingProcessamentoArquivos = ref(false);
+
+    const storePedidos = useStorePedidos();
 
     // DATA RETORNADO DOS PEDIDOS DE INSCRIÇÃO
     const dataListaEspecializacao = ref<any>([]);
@@ -119,6 +122,11 @@ export default defineComponent({
           timeout: 3000,
         });
         loadingRejeitado.value = false;
+        modalDetalhesPedidos.value = false;
+        buscarListaPedidos();
+        storePedidos.buscarPedidosAprovados();
+        storePedidos.buscarPedidosPendentes();
+        storePedidos.buscarPedidosReprovados();
       } else {
         toast.error(response?.object.detail, {
           timeout: 3000,
@@ -150,6 +158,11 @@ export default defineComponent({
           timeout: 3000,
         });
         loadingAceitado.value = false;
+        modalDetalhesPedidos.value = false;
+        buscarListaPedidos();
+        storePedidos.buscarPedidosAprovados();
+        storePedidos.buscarPedidosPendentes();
+        storePedidos.buscarPedidosReprovados();
       } else {
         toast.error(response?.object.detail, {
           timeout: 3000,

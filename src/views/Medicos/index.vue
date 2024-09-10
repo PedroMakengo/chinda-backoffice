@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, watch } from "vue";
 import Title from "@/components/Title/index.vue";
+import TitleModal from "@/components/TitleModal/index.vue";
 import { UsecaseListaMedicos } from "@/Domain/Usecases/Medicos/usecase_lista_medicos";
 import { UsecaseListaMedicosEspecializacao } from "@/Domain/Usecases/Medicos/usecase_lista_medicos_especializacao";
 import { UsecaseListaMedicosPorId } from "@/Domain/Usecases/Medicos/usecase_lista_medicos_id";
@@ -9,7 +10,7 @@ import { UsecaseListaProvincias } from "@/Domain/Usecases/Provincias/usecase_lis
 import { FormatarData } from "@/utils/formatarData";
 
 export default defineComponent({
-  components: { Title },
+  components: { Title, TitleModal },
   setup() {
     // VARIAVIES
     const loading = ref(false);
@@ -20,6 +21,7 @@ export default defineComponent({
       { key: "nome", title: "Nome" },
       { key: "sobrenome", title: "Sobrenome" },
       { key: "telefone", title: "Telefone" },
+      { key: "email", title: "E-mail" },
       { key: "especializacao.descricao", title: "Especialização" },
       { key: "precoConsulta", title: "Preço Consulta" },
       { key: "accoes", title: "Acções", sortable: false },
@@ -68,12 +70,20 @@ export default defineComponent({
       });
     };
 
+    const dataHorarios = ref<any>([]);
+
     const buscarMedicoPorId = async (id: number | string) => {
       const response = await UsecaseListaMedicosPorId.handler(id);
 
       dataMedico.value = response?.object;
 
+      dataHorarios.value = dataMedico.value.horarios;
+      dataObjecto.value = dataMedico.value;
+      dataVinculo.value = dataMedico.value.vinculos;
+
+      console.log("-------------------");
       console.log(dataMedico.value);
+      console.log("-------------------");
     };
 
     const onRefreshDataAprrovad = async () => {
@@ -92,6 +102,8 @@ export default defineComponent({
 
     const handlerDetalhesMedicos = (item: any) => {
       dataVinculo.value = item.vinculos;
+      modalDetalhesMedicos.value = true;
+
       buscarMedicoPorId(item.id);
     };
 
@@ -123,6 +135,8 @@ export default defineComponent({
       handlerDetalhesMedicos,
       dataMedico,
       dataObjecto,
+      dataVinculo,
+      dataHorarios,
     };
   },
 });
@@ -204,22 +218,13 @@ export default defineComponent({
     <v-dialog v-model="modalDetalhesMedicos" width="85%" persistent>
       <v-card>
         <TitleModal
-          title="Detalhes Pedido de Inscrição"
+          title="Detalhes Médico"
           @fechar="modalDetalhesMedicos = false"
         />
         <v-card-text>
           <div class="formulario">
             <form class="spacing">
               <v-row class="pt-4 pb-4">
-                <v-col cols="12" md="4">
-                  <v-text-field
-                    clearable
-                    label="Processo"
-                    variant="outlined"
-                    v-model="dataObjecto.processo"
-                    readonly
-                  ></v-text-field>
-                </v-col>
                 <v-col cols="12" md="4">
                   <v-text-field
                     clearable
@@ -247,7 +252,7 @@ export default defineComponent({
                     readonly
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12" md="8">
+                <v-col cols="12" md="4">
                   <v-autocomplete
                     clearable
                     label="Especialização"
@@ -258,6 +263,24 @@ export default defineComponent({
                     item-value="id"
                     readonly
                   ></v-autocomplete>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field
+                    clearable
+                    label="Endereço"
+                    variant="outlined"
+                    v-model="dataObjecto.endereco"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field
+                    clearable
+                    label="Preço"
+                    variant="outlined"
+                    v-model="dataObjecto.precoConsulta"
+                    readonly
+                  ></v-text-field>
                 </v-col>
               </v-row>
 
@@ -271,29 +294,34 @@ export default defineComponent({
                 </v-col>
 
                 <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
-                <v-col
-                  md="12"
-                  cols="6"
-                  v-for="(el, index) in dataVinculo"
-                  :key="index"
-                >
-                  <div class="card">
-                    <div class="card-content">
-                      <div class="card-image">
-                        {{ el.hospital[0] }}
-                      </div>
-                      <div class="card-descricao">
-                        <h4>{{ el.hospital }}</h4>
-                        <span class="item-cidade"
-                          >{{ el.cidade }} - {{ el.pais }}</span
-                        >
-                        <h5>
-                          {{ FormatarData(el.dataInicio) }} -
-                          {{ FormatarData(el.dataFim) }}
-                        </h5>
+                <template v-if="dataVinculo.length > 0">
+                  <v-col
+                    md="12"
+                    cols="6"
+                    v-for="(el, index) in dataVinculo"
+                    :key="index"
+                  >
+                    <div class="card">
+                      <div class="card-content">
+                        <div class="card-image">
+                          {{ el.hospital[0] }}
+                        </div>
+                        <div class="card-descricao">
+                          <h4>{{ el.hospital }}</h4>
+                          <span class="item-cidade"
+                            >{{ el.cidade }} - {{ el.pais }}</span
+                          >
+                          <h5>
+                            {{ FormatarData(el.dataInicio) }} -
+                            {{ FormatarData(el.dataFim) }}
+                          </h5>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </v-col>
+                </template>
+                <v-col v-else>
+                  <p>Não existe nenhum vinculo</p>
                 </v-col>
                 <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
               </v-row>
@@ -303,41 +331,37 @@ export default defineComponent({
                   <v-divider></v-divider>
                 </v-col>
                 <v-col cols="12" md="12">
-                  <h2>Arquivos</h2>
+                  <h2>Horários</h2>
                 </v-col>
 
-                <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
-
-                <!-- <template v-if="loadingProcessamentoArquivos">
-                  <v-col cols="12" md="12">
-                    <v-skeleton-loader type="paragraph"></v-skeleton-loader>
-                  </v-col>
-                </template>
-
-                <div v-else>
+                <!-- LISTAGEM DE TODOS OS HORÁRIOS -->
+                <div>
                   <v-col cols="12" md="12" class="mt-2 mb-2">
-                    <div v-if="dataArquivos.length > 0">
+                    <div v-if="dataHorarios.length > 0" class="card-horario">
                       <template
-                        v-for="(el, index) in dataArquivos"
+                        v-for="(el, index) in dataHorarios"
                         :key="index"
                       >
-                        <v-chip
-                          color="green"
-                          class="mr-2 mb-2"
-                          label
-                          @click="handleOpen(el.content)"
-                        >
-                          {{ el.nome }}
-                        </v-chip>
+                        <div class="card-item">
+                          <p>
+                            Dia de Semana: <strong>{{ el.diaSemana }}</strong>
+                          </p>
+                          <p>
+                            Hora Início: <strong>{{ el.horaInicio }}</strong>
+                          </p>
+                          <p>
+                            Hora Fim: <strong>{{ el.horaFim }}</strong>
+                          </p>
+                        </div>
                       </template>
                     </div>
 
                     <div v-else>
-                      <p>Não existe nenhum arquivo</p>
+                      <p>Não existe nenhum horário</p>
                     </div>
                   </v-col>
-                </div> -->
-                <!-- LISTAGEM DE TODOS OS VÍNCULOS -->
+                </div>
+                <!-- LISTAGEM DE TODOS OS HORÁRIOS -->
               </v-row>
             </form>
           </div>
@@ -356,5 +380,45 @@ export default defineComponent({
 
   text-transform: uppercase;
   font-weight: bold;
+}
+
+.card {
+  margin-top: 1.5rem;
+
+  .card-content {
+    display: flex;
+    gap: 1rem;
+
+    .card-image {
+      width: 80px;
+      height: 80px;
+
+      background: #2e8ceb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+
+      font-weight: bold;
+
+      border-radius: 0.1rem;
+      color: #fff;
+    }
+    span {
+      color: #8b8b8b;
+    }
+    h5 {
+      font-size: 1rem;
+      text-transform: lowercase;
+      color: #8b8b8b;
+      font-weight: 300;
+    }
+  }
+}
+
+.card-horario {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
 }
 </style>
