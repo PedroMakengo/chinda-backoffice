@@ -3,6 +3,7 @@ import { ref } from "vue";
 import $router from "@/router";
 import { authStore } from "@/stores/store_autenticacao";
 import { listaMenuPrincipal } from "./menu";
+import { useMenuResponsivo } from "../../stores/store_rail";
 
 const terminarSessao = () => {
   authStore.deleteToken();
@@ -11,16 +12,17 @@ const terminarSessao = () => {
   $router.replace("/");
 };
 
+const store = useMenuResponsivo();
+
 const drawer = ref(true);
-const rail = ref(false);
 const dialog = ref(false);
 </script>
 
 <template>
   <v-navigation-drawer
     v-model="drawer"
-    :rail="rail"
-    @click="rail = false"
+    :rail="store.rail"
+    @click="store.rail = false"
     class="container-navbar"
   >
     <!-- prepend-avatar="../../assets/imgs/logo/isFactory.png" -->
@@ -37,7 +39,7 @@ const dialog = ref(false);
         <v-btn
           variant="text"
           icon="mdi-chevron-left"
-          @click.stop="rail = !rail"
+          @click.stop="store.rail = !store.rail"
         ></v-btn>
       </template>
     </v-list-item>

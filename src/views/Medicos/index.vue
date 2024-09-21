@@ -172,7 +172,8 @@ export default defineComponent({
                   v-model="forms.especializacao"
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="3">
+
+              <v-col cols="12" md="3" class="buttons-pesquisa">
                 <v-btn color="blue" class="mr-2">Pesquisar</v-btn>
                 <v-btn color="orange" class="text-white" @click="onRemoveFilter"
                   >Limpar Filtro</v-btn
@@ -373,52 +374,5 @@ export default defineComponent({
 </template>
 
 <style scoped lang="scss">
-.borderItems {
-  background: #eff4f8;
-  margin-bottom: 1rem;
-  padding: 0.6rem;
-
-  text-transform: uppercase;
-  font-weight: bold;
-}
-
-.card {
-  margin-top: 1.5rem;
-
-  .card-content {
-    display: flex;
-    gap: 1rem;
-
-    .card-image {
-      width: 80px;
-      height: 80px;
-
-      background: #2e8ceb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-
-      font-weight: bold;
-
-      border-radius: 0.1rem;
-      color: #fff;
-    }
-    span {
-      color: #8b8b8b;
-    }
-    h5 {
-      font-size: 1rem;
-      text-transform: lowercase;
-      color: #8b8b8b;
-      font-weight: 300;
-    }
-  }
-}
-
-.card-horario {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(4, 1fr);
-}
+@import url(./styles.module.scss);
 </style>

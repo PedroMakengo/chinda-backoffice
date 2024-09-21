@@ -267,7 +267,7 @@ export default defineComponent({
                   v-model="forms.estado"
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="3" class="buttons-pesquisa">
                 <v-btn
                   color="blue"
                   class="mr-2"
@@ -511,3 +511,9 @@ export default defineComponent({
     <!-- END MODAL -->
   </div>
 </template>
+
+<style lang="scss" scoped>
+.buttons-pesquisa {
+  margin-bottom: 2rem;
+}
+</style>
