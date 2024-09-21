@@ -7,6 +7,8 @@ import Pedidos from "@/views/Pedidos/index.vue";
 import Perfil from "@/views/Perfil/index.vue";
 import Medicos from "@/views/Medicos/index.vue";
 import Home from "@/views/Home/index.vue";
+import Consultas from "@/views/Consultas/index.vue";
+import Disponibilidade from "@/views/Disponibilidade/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -36,6 +38,14 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/dashboard/medicos",
     component: Medicos,
+  },
+  {
+    path: "/dashboard/consultas",
+    component: Consultas,
+  },
+  {
+    path: "/dashboard/disponibilidade",
+    component: Disponibilidade,
   },
 ];
 

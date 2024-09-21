@@ -6,6 +6,12 @@ export const listaMenuPrincipal = [
     title: "Medicos",
   },
   {
+    prependIcon: "mdi mdi-clipboard-pulse-outline",
+    route: "/dashboard/consultas",
+    value: "consultas",
+    title: "Consultas",
+  },
+  {
     prependIcon: "mdi mdi-account-box-outline",
     route: "/dashboard/pedidos",
     value: "pedidos",
@@ -29,7 +35,12 @@ export const listaMenuPrincipal = [
     value: "sintomas",
     title: "Sintomas",
   },
-
+  {
+    prependIcon: "mdi mdi-bacteria",
+    route: "/dashboard/disponibilidade",
+    value: "disponibilidade",
+    title: "Disponibilidade", // Aplicar as permissões
+  },
   {
     prependIcon: "mdi mdi-account-circle",
     route: "/dashboard/perfil",
