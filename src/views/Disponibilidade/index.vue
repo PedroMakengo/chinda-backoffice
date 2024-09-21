@@ -117,7 +117,7 @@ export default defineComponent({
       </div>
     </div>
 
-    <v-dialog v-model="modalAddDisponibilidade" width="55%" persistent>
+    <v-dialog v-model="modalAddDisponibilidade" width="45%" persistent>
       <v-card>
         <TitleModal
           title="Adicionar Disponibilidade"
@@ -127,16 +127,7 @@ export default defineComponent({
           <div class="formulario">
             <form class="spacing" @submit.prevent="onSubmitAddDisponibilidade">
               <v-row class="pt-4 pb-4">
-                <v-col cols="12" md="6">
-                  <v-autocomplete
-                    v-model="form.medicoId"
-                    clearable
-                    label="Médico"
-                    variant="outlined"
-                  ></v-autocomplete>
-                </v-col>
-
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="12">
                   <v-autocomplete
                     v-model="form.diaSemana"
                     clearable

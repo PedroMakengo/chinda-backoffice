@@ -5,8 +5,10 @@ main {
   justify-content: center;
   padding-inline: 1.5rem;
 
-  border-top: 5px solid #fff;
-  background: #2e8deb;
+  background-image: linear-gradient(#2e8deb60, #0f3d6ba3),
+    url(../../assets/imgs/fundoLogins.jpg);
+  background-position: center;
+  background-size: cover;
 
   color: #fff;
 
