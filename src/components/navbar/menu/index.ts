@@ -39,7 +39,7 @@ export const listaMenuPrincipal = [
     prependIcon: "mdi mdi-bacteria",
     route: "/dashboard/disponibilidade",
     value: "disponibilidade",
-    title: "Disponibilidade", // Aplicar as permissões
+    title: "Disponibilidade",
   },
   {
     prependIcon: "mdi mdi-account-circle",

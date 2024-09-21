@@ -47,6 +47,7 @@ const dialog = ref(false);
         prepend-icon="mdi-home"
         @click="$router.push('/dashboard')"
         title="Home"
+        value="home"
       ></v-list-item>
 
       <template v-for="(item, index) in listaMenuPrincipal" :key="index">

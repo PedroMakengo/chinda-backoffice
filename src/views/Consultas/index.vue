@@ -24,8 +24,8 @@ export default defineComponent({
 
     const cabecalhoTabela = ref([
       { key: "itens", title: "#" },
-      { key: "medico.nomeSobrenome", title: "Nome do Médico" },
-      { key: "utente.nomeSobrenome", title: "Nome do Utente" },
+      { key: "medico.nomeSobrenome", title: "Médico" },
+      { key: "utente.nomeSobrenome", title: "Utente" },
       { key: "dataMarcacao", title: "Data Início" },
       { key: "horaMarcacao", title: "Hora Início" },
       { key: "dataFim", title: "Hora Marcação Final" },
