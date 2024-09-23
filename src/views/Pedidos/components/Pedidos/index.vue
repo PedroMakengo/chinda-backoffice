@@ -262,7 +262,7 @@ export default defineComponent({
           :items="dataListaPedidos"
           :loading="loadingTabela"
         >
-          <template v-slot:[`item.estado`]="{ item }">
+          <template v-slot:[`item.estado`]="{ item }: any">
             <v-chip label color="orange">{{ item.estado.descricao }}</v-chip>
           </template>
 
