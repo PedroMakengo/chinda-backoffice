@@ -253,11 +253,11 @@ export default defineComponent({
           :items="dataListaPedidos"
           :loading="loadingTabela"
         >
-          <template v-slot:[`item.estado`]="{ item }">
+          <template v-slot:[`item.estado`]="{ item }: any">
             <v-chip label color="blue">{{ item.estado.descricao }}</v-chip>
           </template>
 
-          <template v-slot:[`item.accoes`]="{ item }">
+          <template v-slot:[`item.accoes`]="{ item }: any">
             <v-menu transition="slide-x-transition">
               <template v-slot:activator="{ props }">
                 <v-btn icon="mdi-dots-vertical" size="small" v-bind="props">

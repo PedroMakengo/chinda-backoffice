@@ -1,12 +1,15 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import { authStore } from "@/stores/store_autenticacao";
+import { useRoute } from "vue-router";
+
 import { UsecaseUtilizadorResetPassword } from "@/Domain/Usecases/Utilizadores/utilizador_reset_password";
 
 import { useToast } from "vue-toastification";
 
 export default defineComponent({
   setup() {
+    const route = useRoute();
+    const loading = ref(false);
     const form = ref<any>({
       password: undefined!,
       email: undefined!,
@@ -15,11 +18,18 @@ export default defineComponent({
 
     const toast = useToast();
 
-    const handleToken = async () => {
-      form.value.token = await authStore.getToken().token;
+    const buscarDadosUrl = () => {
+      const token = route.query.token;
+      const email = route.query.email;
+
+      if (Object.keys(route.query).length !== 0) {
+        form.value.token = token;
+        form.value.email = email;
+      }
     };
     // SUBMIT RESET PASSWORD
     const onSubmitResetPassword = async () => {
+      loading.value = true;
       const data = {
         password: form.value.password,
         token: form.value.token,
@@ -27,24 +37,27 @@ export default defineComponent({
       };
 
       const response = await UsecaseUtilizadorResetPassword.store(data);
-
+      console.log(data);
       console.log(response);
 
       if (response?.success) {
         toast.success(response?.object, {
           timeout: 3000,
         });
+        loading.value = false;
       } else {
-        toast.error(response?.object, {
+        toast.error(response?.object.detail, {
           timeout: 3000,
         });
+        loading.value = false;
       }
     };
 
     onMounted(() => {
-      handleToken();
+      buscarDadosUrl();
     });
-    return { form, onSubmitResetPassword };
+
+    return { form, onSubmitResetPassword, loading };
   },
 });
 </script>
@@ -59,7 +72,11 @@ export default defineComponent({
       <div class="reset-form">
         <v-row>
           <v-col cols="12" md="12">
-            <v-text-field label="E-mail" v-model="form.email"></v-text-field>
+            <v-text-field
+              label="E-mail"
+              v-model="form.email"
+              readonly
+            ></v-text-field>
           </v-col>
           <v-col cols="12" md="12">
             <v-text-field
@@ -69,7 +86,9 @@ export default defineComponent({
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="12">
-            <v-btn @click="onSubmitResetPassword">Reset Password</v-btn>
+            <v-btn @click="onSubmitResetPassword" :loading="loading"
+              >Reset Password</v-btn
+            >
             <p class="reset-password">
               Lembrou da senha ?
               <router-link to="/">Iniciar Sessão</router-link>

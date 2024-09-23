@@ -297,7 +297,7 @@ export default defineComponent({
           :items="dataListaMarcacoes"
           :loading="loading"
         >
-          <template v-slot:[`item.estado`]="{ item }">
+          <template v-slot:[`item.estado`]="{ item }: any">
             <v-chip label color="red" v-if="item.estado === 1"
               >Cancelado</v-chip
             >
