@@ -24,6 +24,11 @@ const routes = [
     component: ResetPassword,
   },
   {
+    path: "/utilizador/reset-password",
+    name: "reset-password",
+    component: ResetPassword,
+  },
+  {
     path: "/dashboard",
     component: Layout,
     meta: { requiresAuth: true },
