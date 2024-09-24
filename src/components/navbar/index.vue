@@ -32,7 +32,9 @@ const filtrarRotasPorPerfil = computed(() => {
         rota.value === "perfil"
     );
   } else if (perfil.value === "Admin") {
-    return listaMenuPrincipal;
+    return listaMenuPrincipal.filter(
+      (rota) => rota.value !== "disponibilidade"
+    );
   }
   return [];
 });
