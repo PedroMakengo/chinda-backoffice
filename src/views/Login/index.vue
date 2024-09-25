@@ -48,6 +48,7 @@ export default defineComponent({
         toast.error(`${response?.object.detail}`, {
           timeout: 3000,
         });
+        loading.value = false;
       }
     };
 

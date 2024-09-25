@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 import $router from "@/router";
 import { authStore } from "@/stores/store_autenticacao";
 import { listaMenuPrincipal } from "./menu";
+import { useMenuResponsivo } from "../../stores/store_rail";
 
 const terminarSessao = () => {
   authStore.deleteToken();
@@ -11,16 +12,43 @@ const terminarSessao = () => {
   $router.replace("/");
 };
 
+const store = useMenuResponsivo();
+
 const drawer = ref(true);
-const rail = ref(false);
 const dialog = ref(false);
+const perfil = ref("");
+
+const retornarUtilizador = async () => {
+  let responseLocalStorage: any = await authStore.getUser();
+  perfil.value = responseLocalStorage.perfis[0];
+};
+
+const filtrarRotasPorPerfil = computed(() => {
+  if (perfil.value === "Medico") {
+    return listaMenuPrincipal.filter(
+      (rota) =>
+        rota.value === "consultas" ||
+        rota.value === "disponibilidade" ||
+        rota.value === "perfil"
+    );
+  } else if (perfil.value === "Admin") {
+    return listaMenuPrincipal.filter(
+      (rota) => rota.value !== "disponibilidade"
+    );
+  }
+  return [];
+});
+
+onMounted(() => {
+  retornarUtilizador();
+});
 </script>
 
 <template>
   <v-navigation-drawer
     v-model="drawer"
-    :rail="rail"
-    @click="rail = false"
+    :rail="store.rail"
+    @click="store.rail = false"
     class="container-navbar"
   >
     <!-- prepend-avatar="../../assets/imgs/logo/isFactory.png" -->
@@ -37,7 +65,7 @@ const dialog = ref(false);
         <v-btn
           variant="text"
           icon="mdi-chevron-left"
-          @click.stop="rail = !rail"
+          @click.stop="store.rail = !store.rail"
         ></v-btn>
       </template>
     </v-list-item>
@@ -47,9 +75,10 @@ const dialog = ref(false);
         prepend-icon="mdi-home"
         @click="$router.push('/dashboard')"
         title="Home"
+        value="home"
       ></v-list-item>
 
-      <template v-for="(item, index) in listaMenuPrincipal" :key="index">
+      <template v-for="(item, index) in filtrarRotasPorPerfil" :key="index">
         <v-list-item
           :prepend-icon="item.prependIcon"
           @click="$router.push(item.route)"

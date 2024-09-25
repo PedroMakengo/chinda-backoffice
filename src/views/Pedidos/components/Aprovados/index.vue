@@ -253,11 +253,11 @@ export default defineComponent({
           :items="dataListaPedidos"
           :loading="loadingTabela"
         >
-          <template v-slot:[`item.estado`]="{ item }">
+          <template v-slot:[`item.estado`]="{ item }: any">
             <v-chip label color="blue">{{ item.estado.descricao }}</v-chip>
           </template>
 
-          <template v-slot:[`item.accoes`]="{ item }">
+          <template v-slot:[`item.accoes`]="{ item }: any">
             <v-menu transition="slide-x-transition">
               <template v-slot:activator="{ props }">
                 <v-btn icon="mdi-dots-vertical" size="small" v-bind="props">
@@ -283,23 +283,6 @@ export default defineComponent({
           <v-card-text>
             <div class="formulario">
               <form class="spacing">
-                <!-- <v-row>
-                  <v-col cols="12" md="12" align="right">
-                    <v-btn
-                      class="mr-2"
-                      @click="onSubmitAprovarPedidoInscricao"
-                      color="blue"
-                      :loading="loadingAceitado"
-                      >Aprovar Pedido</v-btn
-                    >
-                    <v-btn
-                      @click="onSubmitRejeitarPedidoInscricao"
-                      color="red"
-                      :loading="loadingRejeitado"
-                      >Reprovar Pedido
-                    </v-btn>
-                  </v-col>
-                </v-row> -->
                 <v-row class="pt-4 pb-4">
                   <v-col cols="12" md="4">
                     <v-text-field

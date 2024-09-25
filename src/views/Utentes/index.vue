@@ -20,6 +20,8 @@ export default defineComponent({
       { key: "nome", title: "Nome" },
       { key: "sobrenome", title: "Sobrenome" },
       { key: "telefone", title: "Nº de Telefone" },
+      { key: "endereco.provincia.nome", title: "Província" },
+      { key: "endereco.cidade", title: "Cidade" },
       { key: "accoes", title: "Acções", sortable: false },
     ]);
     const search = ref("");
@@ -45,6 +47,8 @@ export default defineComponent({
         item["sobrenome"] =
           item["sobrenome"] === null ? "--" : item["sobrenome"];
       });
+
+      console.log(dataListaUtente);
     };
 
     const onSubmitAddUtentes = async () => {

@@ -5,8 +5,16 @@ export function FormatarDataEditavel(data: any) {
   const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
   const ano = dataObj.getFullYear();
 
-  // const dataFormatada = `${dia}/${mes}/${ano}`;
-  const dataFormatada = `${ano}-${mes}-${dia}`;
+  const dataFormatada = `${dia}/${mes}/${ano}`;
+  // const dataFormatada = `${ano}-${mes}-${dia}`;
 
   return dataFormatada;
+}
+
+export function FormatarHoraEditavel(isoString: any) {
+  const date = new Date(isoString);
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+
+  return `${hours}:${minutes}`;
 }

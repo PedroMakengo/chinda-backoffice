@@ -35,10 +35,14 @@ class AuthStore {
   }
 
   async obterToken() {
-    await localdb.read("token").then((v) => {
-      return v;
+    await localdb.read("token").then((value) => {
+      return value;
     });
     return await localdb.read("token");
+  }
+
+  async getUser(): Promise<Utilizador> {
+    return (await localdb.read("utilizador")) as Utilizador;
   }
 
   async deleteToken() {

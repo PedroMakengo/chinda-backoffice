@@ -1,16 +1,20 @@
 .main {
   height: 100vh;
   width: 100%;
-  overflow: hidden !important;
   display: grid;
-  grid-template-columns: 70% 30%;
+  grid-template-columns: 1fr;
+
+  background-image: linear-gradient(#2e8deb60, #0f3d6ba3),
+    url(../../assets/imgs/fundoLogins.jpg);
+  background-position: center;
+  background-size: cover;
+
+  color: #fff;
 
   .banner-info {
     width: 100%;
-    background-image: linear-gradient(#2e8deb60, #0f3d6ba3),
-      url(../../assets/imgs/fundo.jpg);
-    background-position: center;
-    background-size: 104%;
+    height: 100vh;
+    display: none;
   }
 
   .content-formulario {
@@ -39,17 +43,38 @@
       }
 
       .reset-password {
-        border-top: 1px solid #ccc;
-        border-bottom: 1px solid #ccc;
         padding-block: 0.5rem;
 
         margin-top: 2rem;
         text-align: center;
 
         a {
-          text-decoration: none;
-          color: #0f3d6ba3;
+          color: #fff;
         }
+      }
+    }
+  }
+}
+
+@media (width> 1024px) {
+  .main {
+    border-bottom: 0;
+    grid-template-columns: 70% 30% !important;
+    background: #fff;
+    color: #000;
+
+    .banner-info {
+      background-image: linear-gradient(#2e8deb60, #0f3d6ba3),
+        url(../../assets/imgs/fundoLogins.jpg);
+      background-position: center;
+      background-size: cover;
+
+      display: block;
+    }
+
+    .formulario-login {
+      a {
+        color: #000 !important;
       }
     }
   }
