@@ -2,6 +2,8 @@
 import { defineComponent, ref, onMounted } from "vue";
 import Title from "@/components/Title/index.vue";
 import { UsecaseAdicionarDisponibilidade } from "@/Domain/Usecases/Disponibilidade/usecase_adicionar_disponibilidade";
+import { UsecaseObterListaDisponibilidade } from "@/Domain/Usecases/Disponibilidade/usecase_lista_disponibilidade";
+
 import TitleModal from "@/components/TitleModal/index.vue";
 import { authStore } from "@/stores/store_autenticacao";
 import { useToast } from "vue-toastification";
@@ -15,7 +17,6 @@ export default defineComponent({
     const search = ref("");
     const cabecalhoTabela = ref([
       { key: "itens", title: "#" },
-      { key: "medico", title: "Médico" },
       { key: "diaSemana", title: "Dia de Semanas" },
       { key: "horaInicio", title: "Hora Início" },
       { key: "horaFim", title: "Hora Fim" },
@@ -39,13 +40,15 @@ export default defineComponent({
       { id: 7, dia: "Sábado" },
     ];
 
+    const dataListaDisponibilidade = ref<any>([]);
     const dataDisponibilidade = ref<any>([]);
     const dataPreviewDisponiblidade = ref<any>([]);
 
     // FUNÇÕES
     const retornarUtilizador = async () => {
       let response: any = await authStore.getUser();
-      form.value.medicoId = response.id;
+
+      form.value.medicoId = response.medico.id;
       form.value.nomeMedico = response.userName;
     };
 
@@ -59,17 +62,38 @@ export default defineComponent({
 
       const response = await UsecaseAdicionarDisponibilidade.store(data);
 
-      console.log(data);
-
       if (response?.success) {
-        toast.success("Pedido de Inscrição Aprovado com Sucesso", {
+        toast.success("Disponibilidade adicionado com Sucesso", {
           timeout: 3000,
         });
+        modalAddDisponibilidade.value = false;
+        dataDisponibilidade.value = [];
+        dataPreviewDisponiblidade.value = [];
       } else {
         toast.error("Ocorreu um erro ao tentar submeter o pedido", {
           timeout: 3000,
         });
       }
+    };
+
+    const buscarListaDisponibilidade = async (medico: string) => {
+      const response = await UsecaseObterListaDisponibilidade.handler(medico);
+      dataListaDisponibilidade.value = response?.object;
+
+      const diasDaSemana: Record<number, string> = {
+        1: "Segunda-Feira",
+        2: "Segunda-Feira",
+        3: "Terça-Feira",
+        4: "Quarta-Feira",
+        5: "Quinta-Feira",
+        6: "Sexta-Feira",
+        7: "Sábado",
+      };
+
+      dataListaDisponibilidade.value.forEach((el: any, index: number) => {
+        el.itens = index + 1;
+        el.diaSemana = diasDaSemana[el.diaSemana] || el.diaSemana;
+      });
     };
 
     const onAddDisponibilidade = () => {
@@ -93,8 +117,9 @@ export default defineComponent({
       form.value.horaFim = undefined;
     };
 
-    onMounted(() => {
-      retornarUtilizador();
+    onMounted(async () => {
+      await retornarUtilizador();
+      buscarListaDisponibilidade(form.value.medicoId);
     });
 
     return {
@@ -110,6 +135,7 @@ export default defineComponent({
       dataPreviewDisponiblidade,
       dataDisponibilidade,
       onAddDisponibilidade,
+      dataListaDisponibilidade,
     };
   },
 });
@@ -147,7 +173,7 @@ export default defineComponent({
         <v-data-table
           :headers="cabecalhoTabela"
           :search="search"
-          :items="[]"
+          :items="dataListaDisponibilidade"
           :loading="loading"
         >
           <template v-slot:[`item.accoes`]="{ item }">
