@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 import $router from "@/router";
 import { authStore } from "@/stores/store_autenticacao";
 import { listaMenuPrincipal } from "./menu";
@@ -16,6 +16,32 @@ const store = useMenuResponsivo();
 
 const drawer = ref(true);
 const dialog = ref(false);
+const perfil = ref("");
+
+const retornarUtilizador = async () => {
+  let responseLocalStorage: any = await authStore.getUser();
+  perfil.value = responseLocalStorage.perfis[0];
+};
+
+const filtrarRotasPorPerfil = computed(() => {
+  if (perfil.value === "Medico") {
+    return listaMenuPrincipal.filter(
+      (rota) =>
+        rota.value === "consultas" ||
+        rota.value === "disponibilidade" ||
+        rota.value === "perfil"
+    );
+  } else if (perfil.value === "Admin") {
+    return listaMenuPrincipal.filter(
+      (rota) => rota.value !== "disponibilidade"
+    );
+  }
+  return [];
+});
+
+onMounted(() => {
+  retornarUtilizador();
+});
 </script>
 
 <template>
@@ -52,7 +78,7 @@ const dialog = ref(false);
         value="home"
       ></v-list-item>
 
-      <template v-for="(item, index) in listaMenuPrincipal" :key="index">
+      <template v-for="(item, index) in filtrarRotasPorPerfil" :key="index">
         <v-list-item
           :prepend-icon="item.prependIcon"
           @click="$router.push(item.route)"
