@@ -7,6 +7,7 @@ import { UsecaseObterListaDisponibilidade } from "@/Domain/Usecases/Disponibilid
 import TitleModal from "@/components/TitleModal/index.vue";
 import { authStore } from "@/stores/store_autenticacao";
 import { useToast } from "vue-toastification";
+import { FormatarHoraEditavel } from "../../utils/formatarDataEditavel";
 
 export default defineComponent({
   components: { Title, TitleModal },
@@ -15,6 +16,7 @@ export default defineComponent({
     const modalAddDisponibilidade = ref(false);
     const loading = ref(false);
     const search = ref("");
+
     const cabecalhoTabela = ref([
       { key: "itens", title: "#" },
       { key: "diaSemana", title: "Dia de Semanas" },
@@ -22,6 +24,7 @@ export default defineComponent({
       { key: "horaFim", title: "Hora Fim" },
       { key: "accoes", title: "Acções", sortable: false },
     ]);
+
     const form = ref<any>({
       medicoId: undefined,
       diaSemana: undefined,
@@ -42,7 +45,7 @@ export default defineComponent({
 
     const dataListaDisponibilidade = ref<any>([]);
     const dataDisponibilidade = ref<any>([]);
-    const dataPreviewDisponiblidade = ref<any>([]);
+    const dataPreviewDisponibilidade = ref<any>([]);
 
     // FUNÇÕES
     const retornarUtilizador = async () => {
@@ -68,7 +71,9 @@ export default defineComponent({
         });
         modalAddDisponibilidade.value = false;
         dataDisponibilidade.value = [];
-        dataPreviewDisponiblidade.value = [];
+        dataPreviewDisponibilidade.value = [];
+
+        buscarListaDisponibilidade(form.value.medicoId);
       } else {
         toast.error("Ocorreu um erro ao tentar submeter o pedido", {
           timeout: 3000,
@@ -93,6 +98,8 @@ export default defineComponent({
       dataListaDisponibilidade.value.forEach((el: any, index: number) => {
         el.itens = index + 1;
         el.diaSemana = diasDaSemana[el.diaSemana] || el.diaSemana;
+        el.horaInicio = FormatarHoraEditavel(el.horaInicio);
+        el.horaFim = FormatarHoraEditavel(el.horaFim);
       });
     };
 
@@ -105,7 +112,7 @@ export default defineComponent({
       };
 
       dataDisponibilidade.value.push(data);
-      dataPreviewDisponiblidade.value.push(data);
+      dataPreviewDisponibilidade.value.push(data);
 
       resetForm();
     };
@@ -113,13 +120,29 @@ export default defineComponent({
     const resetForm = () => {
       form.value.medicoId = undefined;
       form.value.diaSemana = undefined;
-      form.value.horaInicio = undefined;
-      form.value.horaFim = undefined;
+      adicionarDataAtualInputs();
+    };
+
+    const removerDisponibilidade = (index: any) => {
+      if (index >= 0 && index < dataListaDisponibilidade.value.length) {
+        dataListaDisponibilidade.value.splice(index, 1);
+        dataPreviewDisponibilidade.value.splice(index, 1);
+      } else {
+        console.error("Índice inválido!");
+      }
+    };
+
+    const adicionarDataAtualInputs = () => {
+      const now = new Date();
+      const formattedDateTime = now.toISOString().slice(0, 16);
+      form.value.horaInicio = formattedDateTime;
+      form.value.horaFim = formattedDateTime;
     };
 
     onMounted(async () => {
       await retornarUtilizador();
       buscarListaDisponibilidade(form.value.medicoId);
+      adicionarDataAtualInputs();
     });
 
     return {
@@ -132,10 +155,12 @@ export default defineComponent({
       onSubmitAddDisponibilidade,
       form,
       diasDaSemana,
-      dataPreviewDisponiblidade,
+      dataPreviewDisponibilidade,
       dataDisponibilidade,
       onAddDisponibilidade,
       dataListaDisponibilidade,
+      removerDisponibilidade,
+      FormatarHoraEditavel,
     };
   },
 });
@@ -196,7 +221,7 @@ export default defineComponent({
       </div>
     </div>
 
-    <v-dialog v-model="modalAddDisponibilidade" width="55%" persistent>
+    <v-dialog v-model="modalAddDisponibilidade" width="65%" persistent>
       <v-card>
         <TitleModal
           title="Adicionar Disponibilidade"
@@ -257,25 +282,25 @@ export default defineComponent({
             <div class="display-disponibilidade">
               <v-col cols="12" md="12">
                 <v-row class="mt-0">
-                  <template v-if="dataPreviewDisponiblidade.length > 0">
+                  <template v-if="dataPreviewDisponibilidade.length > 0">
                     <v-col
                       cols="12"
                       md="12"
-                      v-for="(item, index) in dataPreviewDisponiblidade"
+                      v-for="(item, index) in dataPreviewDisponibilidade"
                       :key="index"
                       class="mb-2"
                     >
                       <div class="card-disponibilidade">
                         <div class="container">
-                          <div class="card-avatar">
-                            <span>{{ form.nomeMedico[0] }}</span>
-                          </div>
                           <div class="card-info">
-                            <h4>Médico: {{ form.nomeMedico }}</h4>
+                            <v-btn @click="removerDisponibilidade(index)">
+                              <span>x</span>
+                            </v-btn>
                             <p>Dia de Semana: {{ item.diaSemana }}</p>
                             <p>
-                              Horário: {{ item.horaInicio }} até
-                              {{ item.horaFim }}
+                              Horário:
+                              {{ FormatarHoraEditavel(item.horaInicio) }} até
+                              {{ FormatarHoraEditavel(item.horaFim) }}
                             </p>
                           </div>
                         </div>
