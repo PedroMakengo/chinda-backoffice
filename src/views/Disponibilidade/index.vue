@@ -26,6 +26,7 @@ export default defineComponent({
     ]);
 
     const form = ref<any>({
+      medico: undefined,
       medicoId: undefined,
       diaSemana: undefined,
       horaInicio: undefined,
@@ -52,10 +53,13 @@ export default defineComponent({
       let response: any = await authStore.getUser();
 
       form.value.medicoId = response.medico.id;
+      form.value.medico = response.medico.id;
       form.value.nomeMedico = response.userName;
     };
 
-    const onRefreshDataDisponibilidade = () => {};
+    const onRefreshDataDisponibilidade = () => {
+      buscarListaDisponibilidade(form.value.medico);
+    };
     const handlerDetalhesDisponibilidade = (el: any) => {};
 
     const onSubmitAddDisponibilidade = async () => {
@@ -73,7 +77,9 @@ export default defineComponent({
         dataDisponibilidade.value = [];
         dataPreviewDisponibilidade.value = [];
 
-        buscarListaDisponibilidade(form.value.medicoId);
+        console.log("--------------------------------");
+        buscarListaDisponibilidade(form.value.medico);
+        console.log("--------------------------------");
       } else {
         toast.error("Ocorreu um erro ao tentar submeter o pedido", {
           timeout: 3000,
@@ -94,6 +100,8 @@ export default defineComponent({
         6: "Sexta-Feira",
         7: "Sábado",
       };
+
+      console.log(medico);
 
       dataListaDisponibilidade.value.forEach((el: any, index: number) => {
         el.itens = index + 1;
