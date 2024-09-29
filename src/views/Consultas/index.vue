@@ -13,6 +13,7 @@ import {
   FormatarHoraEditavel,
 } from "@/utils/formatarDataEditavel";
 
+
 export default defineComponent({
   components: { Title, TitleModal },
   setup() {
@@ -22,14 +23,15 @@ export default defineComponent({
       estado: undefined,
     });
 
+    
     const cabecalhoTabela = ref([
       { key: "itens", title: "#" },
       { key: "medico.nomeSobrenome", title: "Médico" },
       { key: "utente.nomeSobrenome", title: "Utente" },
-      { key: "dataMarcacao", title: "Data Início" },
-      { key: "horaMarcacao", title: "Hora Início" },
-      { key: "dataFim", title: "Hora Marcação Final" },
-      { key: "horaFim", title: "Hora Marcação Final" },
+      { key: "dataInicio", title: "Data Início" },
+      { key: "horaInicio", title: "Hora Início" },
+      { key: "dataFim", title: "Data Fim " },
+      { key: "horaFim", title: "Hora Fim" },
       { key: "precoFormatado", title: "Preço Consulta" },
       { key: "estado", title: "Estado" },
       { key: "accoes", title: "Acções", sortable: false },
@@ -54,7 +56,11 @@ export default defineComponent({
 
     const enderecoHorario = ref({
       dataInicio: "",
+      horaInicio: "",
+      dataMarcacao: "",
+      horaMarcacao:"",
       dataFim: "",
+      horaFim: "",
       provincia: "",
       cidade: "",
       endereco1: "",
@@ -91,8 +97,12 @@ export default defineComponent({
       provincia.value = endereco.value.provincia.nome;
       utente.value = dataObjecto.value?.utente;
       enderecoHorario.value = {
-        dataInicio: dataObjecto.value?.horaProvavelInicio,
-        dataFim: dataObjecto.value?.horaFimReal,
+        dataMarcacao:dataObjecto.value?.horaProvavelInicio ? FormatarDataEditavel(dataObjecto.value?.horaProvavelInicio) : "",
+        horaMarcacao:dataObjecto.value?.horaProvavelInicio ? FormatarHoraEditavel(dataObjecto.value?.horaProvavelInicio) : "",
+        dataInicio: dataObjecto.value?.horaInicio ? FormatarDataEditavel(dataObjecto.value?.horaInicio): "",
+        horaInicio: dataObjecto.value?.horaInicio ? FormatarHoraEditavel(dataObjecto.value?.horaInicio): "",
+        dataFim: dataObjecto.value?.horaFimReal ?? "",
+        horaFim: dataObjecto.value?.horaFimReal ? FormatarHoraEditavel(dataObjecto.value?.horaInicio): "",
         provincia: dataObjecto.value?.endereco.provincia.nome,
         cidade: dataObjecto.value?.cidade,
         endereco1: dataObjecto.value?.endereco1,
@@ -165,10 +175,10 @@ export default defineComponent({
         el["medico.nomeSobrenome"] = `${el.medico.nome} ${el.medico.sobrenome}`;
         el["utente.nomeSobrenome"] = `${el.utente.nome} ${el.utente.sobrenome}`;
         el["precoFormatado"] = FormatarPreco(el.precoConsulta);
-        el["dataMarcacao"] = FormatarDataEditavel(el["horaProvavelInicio"]);
-        el["horaMarcacao"] = FormatarHoraEditavel(el["horaProvavelInicio"]);
-        el["dataFim"] = FormatarDataEditavel(el["horaFimReal"]);
-        el["horaFim"] = FormatarHoraEditavel(el["horaFimReal"]);
+        el["dataFim"] = el["horaFimReal"] ? FormatarDataEditavel(el["horaFimReal"]) : "";
+        el["horaFim"] = el["horaFimReal"] ? FormatarHoraEditavel(el["horaFimReal"]) : "";
+        el["dataInicio"] = el["horalInicio"] ? FormatarDataEditavel(el["horalInicio"]) : "";
+        el["horaInicio"] = el["horalInicio"] ? FormatarHoraEditavel(el["horalInicio"]) : "";
         el["estado"] = el.estado.id;
       });
       loading.value = false;
@@ -345,7 +355,6 @@ export default defineComponent({
               <v-row class="pt-4 pb-4">
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Nome"
                     variant="outlined"
                     v-model="medico.nome"
@@ -354,7 +363,6 @@ export default defineComponent({
                 </v-col>
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Sobrenome"
                     variant="outlined"
                     v-model="medico.sobrenome"
@@ -363,7 +371,6 @@ export default defineComponent({
                 </v-col>
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Telefone"
                     variant="outlined"
                     v-model="medico.telefone"
@@ -372,7 +379,6 @@ export default defineComponent({
                 </v-col>
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Preço"
                     variant="outlined"
                     v-model="medico.precoConsulta"
@@ -382,14 +388,9 @@ export default defineComponent({
               </v-row>
 
               <v-row class="mt-2 pt-2">
-                <v-col>
-                  <v-divider></v-divider>
-                </v-col>
-
                 <v-col cols="12" md="12">
                   <h2>UTENTES</h2>
                 </v-col>
-
                 <v-col cols="12" md="12" class="mb-2">
                   <v-divider></v-divider>
                 </v-col>
@@ -398,7 +399,6 @@ export default defineComponent({
               <v-row class="mt-5 pt-5">
                 <v-col cols="12" md="4">
                   <v-text-field
-                    clearable
                     label="Nome"
                     variant="outlined"
                     v-model="utente.nome"
@@ -408,7 +408,6 @@ export default defineComponent({
 
                 <v-col cols="12" md="4">
                   <v-text-field
-                    clearable
                     label="Sobrenome"
                     variant="outlined"
                     v-model="utente.sobrenome"
@@ -418,7 +417,6 @@ export default defineComponent({
 
                 <v-col cols="12" md="4">
                   <v-text-field
-                    clearable
                     label="Telefone"
                     variant="outlined"
                     v-model="utente.telefone"
@@ -428,12 +426,8 @@ export default defineComponent({
               </v-row>
 
               <v-row class="mt-2 pt-2">
-                <v-col>
-                  <v-divider></v-divider>
-                </v-col>
-
                 <v-col cols="12" md="12">
-                  <h2>HORÁRIOS & ENDEREÇO</h2>
+                  <h2>HORÁRIO</h2>
                 </v-col>
 
                 <v-col cols="12" md="12" class="mb-2">
@@ -442,9 +436,26 @@ export default defineComponent({
               </v-row>
 
               <v-row class="mt-5 pt-5">
-                <v-col cols="12" md="3">
+                <v-col cols="12" md="2">
                   <v-text-field
-                    clearable
+                    label="Data Provável Início"
+                    variant="outlined"
+                    v-model="enderecoHorario.dataMarcacao"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+
+                <v-col cols="12" md="2">
+                  <v-text-field
+                    label="Hora Provável Início"
+                    variant="outlined"
+                    v-model="enderecoHorario.horaMarcacao"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+
+                <v-col cols="12" md="2">
+                  <v-text-field
                     label="Data Início"
                     variant="outlined"
                     v-model="enderecoHorario.dataInicio"
@@ -452,20 +463,47 @@ export default defineComponent({
                   ></v-text-field>
                 </v-col>
 
-                <v-col cols="12" md="3">
+                <v-col cols="12" md="2">
                   <v-text-field
-                    clearable
+                    label="Hora Início"
+                    variant="outlined"
+                    v-model="enderecoHorario.horaInicio"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+
+                <v-col cols="12" md="2">
+                  <v-text-field
                     label="Data Fim"
                     variant="outlined"
                     v-model="enderecoHorario.dataFim"
                     readonly
                   ></v-text-field>
                 </v-col>
+                
+                <v-col cols="12" md="2">
+                  <v-text-field
+                    label="Hora Fim"
+                    variant="outlined"
+                    v-model="enderecoHorario.dataFim"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+
               </v-row>
-              <v-row>
+              
+              <v-row class="mt-2 pt-2">
+                <v-col cols="12" md="12">
+                  <h2>ENDEREÇO</h2>
+                </v-col>
+                <v-col cols="12" md="12" class="mb-2">
+                  <v-divider></v-divider>
+                </v-col>
+              </v-row>
+
+              <v-row class="mt-5 pt-5">
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Provincia"
                     variant="outlined"
                     v-model="enderecoHorario.provincia"
@@ -475,7 +513,6 @@ export default defineComponent({
 
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Cidade"
                     variant="outlined"
                     v-model="enderecoHorario.cidade"
@@ -485,7 +522,6 @@ export default defineComponent({
 
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Endereço 1"
                     variant="outlined"
                     v-model="enderecoHorario.endereco1"
@@ -495,7 +531,6 @@ export default defineComponent({
 
                 <v-col cols="12" md="3">
                   <v-text-field
-                    clearable
                     label="Endereço 2"
                     variant="outlined"
                     v-model="enderecoHorario.endereco2"
