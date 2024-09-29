@@ -7,14 +7,20 @@ import { UsecaseObterListaDisponibilidade } from "@/Domain/Usecases/Disponibilid
 import TitleModal from "@/components/TitleModal/index.vue";
 import { authStore } from "@/stores/store_autenticacao";
 import { useToast } from "vue-toastification";
+import {
+  FormatarHoraEditavel,
+  formatDateWithInputTime,
+} from "../../utils/formatarDataEditavel";
 
 export default defineComponent({
   components: { Title, TitleModal },
   setup() {
     const toast = useToast();
     const modalAddDisponibilidade = ref(false);
+    const modalDetalhesDisponibilidade = ref(false);
     const loading = ref(false);
     const search = ref("");
+
     const cabecalhoTabela = ref([
       { key: "itens", title: "#" },
       { key: "diaSemana", title: "Dia de Semanas" },
@@ -22,7 +28,9 @@ export default defineComponent({
       { key: "horaFim", title: "Hora Fim" },
       { key: "accoes", title: "Acções", sortable: false },
     ]);
+
     const form = ref<any>({
+      medico: undefined,
       medicoId: undefined,
       diaSemana: undefined,
       horaInicio: undefined,
@@ -42,25 +50,36 @@ export default defineComponent({
 
     const dataListaDisponibilidade = ref<any>([]);
     const dataDisponibilidade = ref<any>([]);
-    const dataPreviewDisponiblidade = ref<any>([]);
+    const dataPreviewDisponibilidade = ref<any>([]);
 
     // FUNÇÕES
     const retornarUtilizador = async () => {
       let response: any = await authStore.getUser();
 
       form.value.medicoId = response.medico.id;
+      form.value.medico = response.medico.id;
       form.value.nomeMedico = response.userName;
     };
 
-    const onRefreshDataDisponibilidade = () => {};
-    const handlerDetalhesDisponibilidade = (el: any) => {};
+    const onRefreshDataDisponibilidade = () => {
+      buscarListaDisponibilidade(form.value.medico);
+    };
 
     const onSubmitAddDisponibilidade = async () => {
+      // let dataFormatado = dataDisponibilidade.value.forEach((item: any) => {
+      //   item["horaInicio"] = formatDateWithInputTime(item.horaInicio);
+      //   item["horaFim"] = formatDateWithInputTime(item.horaFim);
+      // });
+
       const data = {
         disponibilidade: dataDisponibilidade.value,
       };
 
       const response = await UsecaseAdicionarDisponibilidade.store(data);
+
+      console.log("--------------------");
+      console.log(data);
+      console.log("--------------------");
 
       if (response?.success) {
         toast.success("Disponibilidade adicionado com Sucesso", {
@@ -68,7 +87,9 @@ export default defineComponent({
         });
         modalAddDisponibilidade.value = false;
         dataDisponibilidade.value = [];
-        dataPreviewDisponiblidade.value = [];
+        dataPreviewDisponibilidade.value = [];
+
+        buscarListaDisponibilidade(form.value.medico);
       } else {
         toast.error("Ocorreu um erro ao tentar submeter o pedido", {
           timeout: 3000,
@@ -93,6 +114,8 @@ export default defineComponent({
       dataListaDisponibilidade.value.forEach((el: any, index: number) => {
         el.itens = index + 1;
         el.diaSemana = diasDaSemana[el.diaSemana] || el.diaSemana;
+        el.horaInicio = FormatarHoraEditavel(el.horaInicio);
+        el.horaFim = FormatarHoraEditavel(el.horaFim);
       });
     };
 
@@ -105,16 +128,35 @@ export default defineComponent({
       };
 
       dataDisponibilidade.value.push(data);
-      dataPreviewDisponiblidade.value.push(data);
+      dataPreviewDisponibilidade.value.push(data);
+
+      console.log(data);
 
       resetForm();
     };
 
     const resetForm = () => {
-      form.value.medicoId = undefined;
       form.value.diaSemana = undefined;
       form.value.horaInicio = undefined;
       form.value.horaFim = undefined;
+    };
+
+    const removerDisponibilidade = (index: any) => {
+      if (index >= 0 && index < dataDisponibilidade.value.length) {
+        dataDisponibilidade.value.splice(index, 1);
+        dataPreviewDisponibilidade.value.splice(index, 1);
+      } else {
+        console.error("Índice inválido!");
+      }
+    };
+
+    const dataDetalheDisponibilidade = ref<any>({});
+
+    const handlerDetalhesDisponibilidade = (item: any) => {
+      modalDetalhesDisponibilidade.value = true;
+
+      dataDetalheDisponibilidade.value = item;
+      console.log(item);
     };
 
     onMounted(async () => {
@@ -127,15 +169,19 @@ export default defineComponent({
       loading,
       cabecalhoTabela,
       onRefreshDataDisponibilidade,
-      handlerDetalhesDisponibilidade,
       modalAddDisponibilidade,
+      modalDetalhesDisponibilidade,
       onSubmitAddDisponibilidade,
       form,
       diasDaSemana,
-      dataPreviewDisponiblidade,
+      dataPreviewDisponibilidade,
       dataDisponibilidade,
       onAddDisponibilidade,
       dataListaDisponibilidade,
+      removerDisponibilidade,
+      FormatarHoraEditavel,
+      handlerDetalhesDisponibilidade,
+      dataDetalheDisponibilidade,
     };
   },
 });
@@ -170,13 +216,15 @@ export default defineComponent({
           ></v-text-field>
         </v-card-title>
 
+        <!-- {{ dataListaDisponibilidade }} -->
+
         <v-data-table
           :headers="cabecalhoTabela"
           :search="search"
           :items="dataListaDisponibilidade"
           :loading="loading"
         >
-          <template v-slot:[`item.accoes`]="{ item }">
+          <template v-slot:[`item.accoes`]="{ item }: any">
             <v-menu transition="slide-x-transition">
               <template v-slot:activator="{ props }">
                 <v-btn icon="mdi-dots-vertical" size="small" v-bind="props">
@@ -196,7 +244,7 @@ export default defineComponent({
       </div>
     </div>
 
-    <v-dialog v-model="modalAddDisponibilidade" width="55%" persistent>
+    <v-dialog v-model="modalAddDisponibilidade" width="65%" persistent>
       <v-card>
         <TitleModal
           title="Adicionar Disponibilidade"
@@ -225,7 +273,7 @@ export default defineComponent({
                   <v-col cols="12" md="6">
                     <v-text-field
                       v-model="form.horaInicio"
-                      type="datetime-local"
+                      type="time"
                       clearable
                       label="Hora Início"
                       variant="outlined"
@@ -233,7 +281,7 @@ export default defineComponent({
                   </v-col>
                   <v-col cols="12" md="6">
                     <v-text-field
-                      type="datetime-local"
+                      type="time"
                       v-model="form.horaFim"
                       clearable
                       label="Hora Fim"
@@ -257,24 +305,24 @@ export default defineComponent({
             <div class="display-disponibilidade">
               <v-col cols="12" md="12">
                 <v-row class="mt-0">
-                  <template v-if="dataPreviewDisponiblidade.length > 0">
+                  <template v-if="dataPreviewDisponibilidade.length > 0">
                     <v-col
                       cols="12"
                       md="12"
-                      v-for="(item, index) in dataPreviewDisponiblidade"
+                      v-for="(item, index) in dataPreviewDisponibilidade"
                       :key="index"
                       class="mb-2"
                     >
                       <div class="card-disponibilidade">
                         <div class="container">
-                          <div class="card-avatar">
-                            <span>{{ form.nomeMedico[0] }}</span>
-                          </div>
                           <div class="card-info">
-                            <h4>Médico: {{ form.nomeMedico }}</h4>
+                            <v-btn @click="removerDisponibilidade(index)">
+                              <span>x</span>
+                            </v-btn>
                             <p>Dia de Semana: {{ item.diaSemana }}</p>
                             <p>
-                              Horário: {{ item.horaInicio }} até
+                              Horário:
+                              {{ item.horaInicio }} até
                               {{ item.horaFim }}
                             </p>
                           </div>
@@ -295,6 +343,41 @@ export default defineComponent({
               </v-col>
             </div>
           </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="modalDetalhesDisponibilidade" width="60%" persistent>
+      <v-card>
+        <TitleModal
+          title="Detalhe de Disponibilidade"
+          @fechar="modalDetalhesDisponibilidade = false"
+        />
+
+        <v-card-text>
+          <v-row class="mt-4">
+            <v-col cols="12" md="12">
+              <v-text-field
+                v-model="dataDetalheDisponibilidade.diaSemana"
+                label="Dia de Semana"
+                readonly
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6" md="6">
+              <v-text-field
+                label="Hora Início"
+                v-model="dataDetalheDisponibilidade.horaInicio"
+                readonly
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6" md="6">
+              <v-text-field
+                label="Hora Fim"
+                v-model="dataDetalheDisponibilidade.horaFim"
+                readonly
+              ></v-text-field>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-dialog>
