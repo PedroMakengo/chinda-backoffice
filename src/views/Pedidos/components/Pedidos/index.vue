@@ -189,6 +189,7 @@ export default defineComponent({
         processo: item.processo,
         sobrenome: item.sobrenome,
         telefone: item.telefone,
+        numeroDocumento: item.numeroDocumento
       };
 
       dataVinculo.value = item.vinculos;
@@ -345,10 +346,17 @@ export default defineComponent({
                       v-model="dataObjecto.telefone"
                       readonly
                     ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" md="8">
-                    <v-autocomplete
+                  </v-col>   <v-col cols="12" md="4">
+                    <v-text-field
                       clearable
+                      label="Nº Documento"
+                      variant="outlined"
+                      v-model="dataObjecto.numeroDocumento"
+                      readonly
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-autocomplete
                       label="Especialização"
                       variant="outlined"
                       :items="dataListaEspecializacao"
