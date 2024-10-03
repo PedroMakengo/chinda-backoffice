@@ -7,6 +7,7 @@ import { UsecaseListaMedicos } from "@/Domain/Usecases/Medicos/usecase_lista_med
 import { UsecaseListaMarcacoes } from "@/Domain/Usecases/Marcacoes/usecase_lista_marcacoes";
 import { UsecaseListaMarcacoesPorId } from "@/Domain/Usecases/Marcacoes/usecase_lista_marcacao_por_id";
 import { FormatarPreco } from "@/utils/formatarPreco";
+import { authStore } from "@/stores/store_autenticacao";
 
 import {
   FormatarDataEditavel,
@@ -82,6 +83,17 @@ export default defineComponent({
       buscarListaMarcacoes();
     };
 
+    // Pegando o Utilizador Logado
+    const perfil = ref("");
+    const medicoId = ref("");
+
+    const retornarUtilizador = async () => {
+      let responseLocalStorage: any = await authStore.getUser();
+
+      medicoId.value = responseLocalStorage.medico.id;
+      perfil.value = responseLocalStorage.perfis[0];
+    };
+
     const handlerDetalhesMarcacao = (marcacao: any) => {
       modalDetalhesConsultas.value = true;
 
@@ -114,62 +126,41 @@ export default defineComponent({
       loading.value = true;
 
       let query = "";
+      const perfilMedico = perfil.value === "Medico"; // Verifica se o perfil é de médico
+      const medicoIdLogado = perfilMedico
+        ? medicoId.value
+        : forms.value.medicos; // Usa o ID do médico conforme o perfil
 
       // Verifica se todos os campos estão definidos
       if (
-        forms.value.medicos !== undefined &&
-        forms.value.estado !== undefined &&
-        forms.value.utentes !== undefined
+        forms.value.utentes !== undefined &&
+        forms.value.estado !== undefined
       ) {
-        query += `?utenteId=${forms.value.utentes}&estado=${forms.value.estado}&medicoId=${forms.value.medicos}`;
+        query += `?utenteId=${forms.value.utentes}&estado=${forms.value.estado}&medicoId=${medicoIdLogado}`;
       } else {
-        // Verifica se 'medicos' e 'utentes' estão definidos
-        if (
-          forms.value.medicos !== undefined &&
-          forms.value.utentes !== undefined
-        ) {
-          query += `?utenteId=${forms.value.utentes}&medicoId=${forms.value.medicos}`;
+        // Verifica se 'utentes' está definido
+        if (forms.value.utentes !== undefined) {
+          query += `?utenteId=${forms.value.utentes}&medicoId=${medicoIdLogado}`;
         }
-        // Verifica se 'medicos' e 'estado' estão definidos
-        else if (
-          forms.value.medicos !== undefined &&
-          forms.value.estado !== undefined
-        ) {
-          query += `?estado=${forms.value.estado}&medicoId=${forms.value.medicos}`;
-        }
-        // Verifica se 'utentes' e 'estado' estão definidos
-        else if (
-          forms.value.utentes !== undefined &&
-          forms.value.estado !== undefined
-        ) {
-          query += `?utenteId=${forms.value.utentes}&estado=${forms.value.estado}`;
-        }
-        // Verifica se apenas 'medicos' está definido
-        else if (forms.value.medicos !== undefined) {
-          query += `?medicoId=${forms.value.medicos}`;
-        }
-        // Verifica se apenas 'estado' está definido
+        // Verifica se 'estado' está definido
         else if (forms.value.estado !== undefined) {
-          query += `?estado=${forms.value.estado}`;
+          query += `?estado=${forms.value.estado}&medicoId=${medicoIdLogado}`;
         }
-        // Verifica se apenas 'utentes' está definido
-        else if (forms.value.utentes !== undefined) {
-          query += `?utenteId=${forms.value.utentes}`;
+        // Caso nenhum dos filtros esteja definido, passa apenas o medicoId
+        else {
+          query += `?medicoId=${medicoIdLogado}`;
         }
       }
 
       const response = await UsecaseListaMarcacoes.handler(query);
       dataListaMarcacoes.value = response.object.items;
 
+      retornaMarcacoesFormatados();
+
       loading.value = false;
     };
 
-    const buscarListaMarcacoes = async () => {
-      loading.value = true;
-      const query = `?pageNumber=1&pageSize=1000`;
-      const response = await UsecaseListaMarcacoes.handler(query);
-      dataListaMarcacoes.value = response.object.items;
-
+    const retornaMarcacoesFormatados = () => {
       dataListaMarcacoes.value.forEach((el: any, index: number) => {
         el["itens"] = index + 1;
         el["medico.nomeSobrenome"] = `${el.medico.nome} ${el.medico.sobrenome}`;
@@ -181,6 +172,25 @@ export default defineComponent({
         el["horaInicio"] = el["horalInicio"] ? FormatarHoraEditavel(el["horalInicio"]) : "";
         el["estado"] = el.estado.id;
       });
+    };
+
+    const buscarListaMarcacoes = async () => {
+      loading.value = true;
+      let query = `?pageNumber=1&pageSize=1000`;
+
+      console.log(perfil.value);
+      if (perfil.value !== "Medico") {
+        const response = await UsecaseListaMarcacoes.handler(query);
+        dataListaMarcacoes.value = response.object.items;
+        retornaMarcacoesFormatados();
+      } else {
+        query += `&medicoId=${medicoId.value}`;
+        const response = await UsecaseListaMarcacoes.handler(query);
+        dataListaMarcacoes.value = response.object.items;
+        retornaMarcacoesFormatados();
+
+        console.log("Bateu aqui...");
+      }
       loading.value = false;
     };
 
@@ -205,7 +215,8 @@ export default defineComponent({
       });
     };
 
-    onMounted(() => {
+    onMounted(async () => {
+      await retornarUtilizador();
       buscarListaUtentes();
       buscarListaMedicos();
       buscarListaMarcacoes();
@@ -232,6 +243,7 @@ export default defineComponent({
       enderecoHorario,
       dataEstados,
       buscarMarcacoesPorFiltro,
+      perfil,
     };
   },
 });
@@ -259,7 +271,7 @@ export default defineComponent({
                   v-model="forms.utentes"
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="3" v-if="perfil !== 'Medico'">
                 <v-autocomplete
                   label="Medicos"
                   :items="dataListaMedicos"

@@ -17,6 +17,7 @@ import {
   LinearScale,
   ArcElement,
 } from "chart.js";
+import { UsecaseDataEstatistica } from "../../Domain/Usecases/Marcacoes/usecase_lista_estatistica";
 
 export default {
   components: { Card, Title, Bar, Doughnut },
@@ -142,12 +143,20 @@ export default {
       nome.value = utilizador.value?.userName;
     };
 
+    const estatistica = ref<any>({});
+
+    const dataListaEstatistica = async () => {
+      const response = await UsecaseDataEstatistica.handler();
+      estatistica.value = response?.object;
+    };
+
     const nomeDoUtilizador = computed(() => {
       return `${nome.value}`;
     });
 
     onMounted(() => {
       obterInformacoesUtilizadorLogado();
+      dataListaEstatistica();
     });
 
     return {
@@ -158,6 +167,7 @@ export default {
       chartOptions,
       dataPiaGrafico,
       nomeDoUtilizador,
+      estatistica,
     };
   },
 };
@@ -181,37 +191,29 @@ export default {
       <Card
         icon="mdi mdi-calendar-blank"
         title="Médicos"
-        :count="1"
+        :count="estatistica.medicos"
         color="info"
         class="card"
       />
       <Card
         icon="mdi mdi-calendar-blank"
         title="Utentes"
-        :count="1"
+        :count="estatistica.utentes"
         color="info"
         class="card"
       />
       <Card
         icon="mdi mdi-calendar-blank"
         title="Especialistas"
-        :count="1"
+        :count="estatistica.especialidades"
         color="info"
         class="card"
       />
 
       <Card
         icon="mdi mdi-calendar-blank"
-        title="Perfis"
-        :count="1"
-        color="info"
-        class="card"
-      />
-
-      <Card
-        icon="mdi mdi-calendar-blank"
-        title="Sintomas"
-        :count="1"
+        title="Pedidos"
+        :count="estatistica.pedidos"
         color="info"
         class="card"
       />
@@ -219,7 +221,7 @@ export default {
       <Card
         icon="mdi mdi-calendar-blank"
         title="Utilizadores"
-        :count="1"
+        :count="estatistica.utilizadores"
         color="info"
         class="card"
       />

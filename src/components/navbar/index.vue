@@ -26,10 +26,8 @@ const retornarUtilizador = async () => {
 const filtrarRotasPorPerfil = computed(() => {
   if (perfil.value === "Medico") {
     return listaMenuPrincipal.filter(
-      (rota) =>
-        rota.value === "consultas" ||
-        rota.value === "disponibilidade" ||
-        rota.value === "perfil"
+      (rota) => rota.value === "consultas" || rota.value === "disponibilidade"
+      // rota.value === "perfil"
     );
   } else if (perfil.value === "Admin") {
     return listaMenuPrincipal.filter(
